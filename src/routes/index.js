@@ -1,8 +1,9 @@
 import express from 'express';
-import { testEnvironmentVariable } from '../settings';
+import { login, register } from '../controllers';
 
 const indexRouter = express.Router();
 
-indexRouter.get('/', (req, res) => res.status(200).json({ message: testEnvironmentVariable }));
+indexRouter.post('/login', login);
+indexRouter.post('/register', register);
 
 export default indexRouter;
