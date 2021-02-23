@@ -1,12 +1,12 @@
-import { dbUsername, dbPwd } from '../settings';
+import { dbHost, dbUsername, dbPwd, dbName } from '../settings';
 
 var mysql = require('mysql');
 
 var db = mysql.createConnection({
-  host: "localhost",
+  host: dbHost,
   user: dbUsername,
   password: dbPwd,
-  database: "rpproject"
+  database: dbName
 });
 
 db.connect(function(err) {
@@ -14,19 +14,22 @@ db.connect(function(err) {
   console.log("[DATABASE] Connected!");
 });
 
-function storedProcedure(sql, callback) {
+function buildRequestString(sql)
+{
   let request = "CALL " + sql.name + "(";
-
   sql.params.forEach((elem, i) => {
     if (i != 0)
       request += ", ";
 
     request += "\"" + elem + "\"";
   });
-
   request += ");";
 
-  console.log(request);
+  return request;
+}
+
+function storedProcedure(sql, callback) {
+  let request = buildRequestString(sql);
 
   db.query(request, true, (err, res, fields) => {
     if (err) {

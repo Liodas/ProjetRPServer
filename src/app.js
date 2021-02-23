@@ -12,5 +12,6 @@ app.use(cookieParser());
 app.use('/', indexRouter);
 app.use('/login', indexRouter);
 app.use('/register', indexRouter);
+app.use('/charactersList', indexRouter);
 
 export default app;

@@ -15,7 +15,7 @@ export const login = async (req, res) => {
 
   var sql = { name: "GetUserPasswordByName", params: [ username ] };
 
-  if (validateEmail(req.body.username) == true) {
+  if (validateEmail(username) == true) {
     sql.name = "GetUserPasswordByEmail";
   }
 
@@ -26,12 +26,13 @@ export const login = async (req, res) => {
 
     if (sp_res[0].length != 0) {
 
-      bcrypt.compare(password, sp_res[0][0].password, function(comp_err, comp_res) {
+      var datas = sp_res[0][0];
+
+      bcrypt.compare(password, datas.password, function(comp_err, comp_res) {
         if (comp_err) {
           return res.status(500).send({ message: "InvalidPassword" });
         } else if (comp_res) {
-          var claims = { "name": username };
-          var token = jwt.create(claims, jwtSecret);
+          var token = jwt.create({ "id": datas.id }, jwtSecret);
 
           return res.status(200).send({ auth: true, token: token.compact() });
         } else {
@@ -104,3 +105,16 @@ function validateEmail (emailAdress) {
 
   return false;
 }
+
+var verifyToken = function (token) {
+  try {
+    var decodedJwt = jwt.verify(token, jwtSecret);
+
+    return { isValid: true, datas: decodedJwt.body };
+  }
+  catch (e) {
+    return { isValid: false, datas: null };
+  }
+}
+
+module.exports.verifyToken = verifyToken
